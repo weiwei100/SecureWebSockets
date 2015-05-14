@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.net.Socket;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.net.SocketFactory;
 
@@ -30,6 +32,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
+
+import org.apache.http.message.BasicNameValuePair;
+
 import de.tavendo.autobahn.WebSocket.WebSocketConnectionObserver.WebSocketCloseNotification;
 import de.tavendo.autobahn.WebSocketMessage.WebSocketCloseCode;
 
@@ -55,13 +60,15 @@ public class WebSocketConnection implements WebSocket {
 
 	private WebSocketOptions mWebSocketOptions;
 	private boolean mPreviousConnection = false;
-
+    private List<BasicNameValuePair> mWsHeaders;
 
 
 	public WebSocketConnection() {
 		Log.d(TAG, "WebSocket connection created.");
-
-		this.mHandler = new ThreadHandler(this);
+        mWsHeaders = Arrays.asList(new BasicNameValuePair("Authorization",
+                "Basic " + "53abe3a52f5ced53e7ed8eb8d7691ec41653543ba815b2d7314042aea8c7c040"));
+        this.mHandler = new ThreadHandler(this);
+//		Log.d(TAG, "Headers: " + mWsHeaders);
 	}
 
 
@@ -149,10 +156,10 @@ public class WebSocketConnection implements WebSocket {
 	}
 
 	public void connect(URI webSocketURI, WebSocket.WebSocketConnectionObserver connectionObserver, WebSocketOptions options) throws WebSocketException {
-		connect(webSocketURI, null, connectionObserver, options);
+		connect(webSocketURI, null, connectionObserver, options, mWsHeaders);
 	}
 
-	public void connect(URI webSocketURI, String[] subprotocols, WebSocket.WebSocketConnectionObserver connectionObserver, WebSocketOptions options) throws WebSocketException {
+	public void connect(URI webSocketURI, String[] subprotocols, WebSocket.WebSocketConnectionObserver connectionObserver, WebSocketOptions options, List<BasicNameValuePair> headers) throws WebSocketException {
 		if (isConnected()) {
 			throw new WebSocketException("already connected");
 		}
@@ -168,6 +175,7 @@ public class WebSocketConnection implements WebSocket {
 			this.mWebSocketSubprotocols = subprotocols;
 			this.mWebSocketConnectionObserver = new WeakReference<WebSocket.WebSocketConnectionObserver>(connectionObserver);
 			this.mWebSocketOptions = new WebSocketOptions(options);
+            this.mWsHeaders = headers;
 
 			connect();
 		}
@@ -230,6 +238,7 @@ public class WebSocketConnection implements WebSocket {
 				createWriter();
 
 				WebSocketMessage.ClientHandshake clientHandshake = new WebSocketMessage.ClientHandshake(mWebSocketURI, null, mWebSocketSubprotocols);
+				clientHandshake.mHeaderList = mWsHeaders;
 				mWebSocketWriter.forward(clientHandshake);
 			} catch (Exception e) {
 				onClose(WebSocketCloseNotification.INTERNAL_ERROR, e.getLocalizedMessage());

@@ -18,7 +18,10 @@
 
 package de.tavendo.autobahn;
 
+import org.apache.http.message.BasicNameValuePair;
+
 import java.net.URI;
+import java.util.List;
 
 /**
  * WebSockets message classes.
@@ -56,13 +59,14 @@ public class WebSocketMessage {
 		private final URI mURI;
 		private final URI mOrigin;
 		private final String[] mSubprotocols;
-
+		public List<BasicNameValuePair> mHeaderList;
 
 
 		ClientHandshake(URI uri) {
 			this.mURI = uri;
 			this.mOrigin = null;
 			this.mSubprotocols = null;
+            this.mHeaderList = null;
 		}
 
 		ClientHandshake(URI uri, URI origin, String[] subprotocols) {

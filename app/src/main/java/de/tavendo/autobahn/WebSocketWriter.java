@@ -32,6 +32,8 @@ import android.os.Message;
 import android.util.Base64;
 import android.util.Log;
 
+import org.apache.http.NameValuePair;
+
 /**
  * WebSocket writer, the sending leg of a WebSockets connection.
  * This is run on it's background thread with it's own message loop.
@@ -150,6 +152,7 @@ public class WebSocketWriter extends Thread {
 		mApplicationBuffer.put(("Host: " + message.getURI().getHost() + CRLF).getBytes());
 		mApplicationBuffer.put(("Upgrade: WebSocket" + CRLF).getBytes());
 		mApplicationBuffer.put(("Connection: Upgrade" + CRLF).getBytes());
+//        mApplicationBuffer.put(("Authorization: " + "Basic " + "53abe3a52f5ced53e7ed8eb8d7691ec41653543ba815b2d7314042aea8c7c040" + CRLF).getBytes());
 		mApplicationBuffer.put(("Sec-WebSocket-Key: " + newHandshakeKey() + CRLF).getBytes());
 
 		if (message.getOrigin() != null) {
@@ -166,7 +169,16 @@ public class WebSocketWriter extends Thread {
 		}
 
 		mApplicationBuffer.put(("Sec-WebSocket-Version: " + WEB_SOCKETS_VERSION + CRLF).getBytes());
-		mApplicationBuffer.put((CRLF).getBytes());
+//		mApplicationBuffer.put((CRLF).getBytes());
+
+        if (message.mHeaderList != null) {
+            for (NameValuePair pair : message.mHeaderList) {
+                mApplicationBuffer.put((pair.getName() + ":" + pair.getValue() + CRLF).getBytes());
+                Log.e(TAG, pair.getName() + "        " + pair.getValue());
+            }
+        }
+
+        mApplicationBuffer.put((CRLF).getBytes());
 	}
 
 

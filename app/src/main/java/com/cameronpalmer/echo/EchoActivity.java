@@ -28,7 +28,7 @@ public class EchoActivity extends Activity implements WebSocketConnectionObserve
 	private static final String TAG = EchoActivity.class.getName();
 	
 	private static final String WS_ECHO_SERVER = "ws://echo.websocket.org";
-	private static final String WSS_ECHO_SERVER = "wss://echo.websocket.org";
+	private static final String WSS_ECHO_SERVER = "wss://app-sandbox.spire.io/websocket/v1/61FAA6B8-C284-11E3-A6CF-0002A5D5C51B";
 
 	private EditText mMessageEditText;
 	private ScrollView mResponseScrollView;
@@ -45,7 +45,7 @@ public class EchoActivity extends Activity implements WebSocketConnectionObserve
 	private int mMessageIndex = 1;
 	private volatile boolean mIsConnected = false;
 	private volatile boolean mIsRepeating = false;
-	private volatile boolean mTLSEnabled = false;
+	private volatile boolean mTLSEnabled = true;
 
 
 	@Override
